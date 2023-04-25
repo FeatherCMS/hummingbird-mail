@@ -1,52 +1,52 @@
-// swift-tools-version:5.5
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
     name: "hummingbird-mail",
     platforms: [
-       .macOS(.v10_15)
+       .macOS(.v10_15),
     ],
     products: [
         .library(name: "HummingbirdMail", targets: ["HummingbirdMail"]),
-        .library(name: "MailKit", targets: ["MailKit"]),
-        .library(name: "SES", targets: ["SES"]),
-        .library(name: "SMTP", targets: ["SMTP"])
+        .library(name: "HummingbirdSES", targets: ["HummingbirdSES"]),
+        .library(name: "HummingbirdSMTP", targets: ["HummingbirdSMTP"]),
+        .library(name: "NIOSMTP", targets: ["NIOSMTP"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-nio.git", .upToNextMajor(from: "2.16.0")),
-        .package(url: "https://github.com/apple/swift-nio-ssl.git", .upToNextMajor(from: "2.7.1")),
-        .package(url: "https://github.com/soto-project/soto.git", from: "6.2.0")
+        .package(url: "https://github.com/apple/swift-log", from: "1.5.0"),
+        .package(url: "https://github.com/apple/swift-nio", from: "2.51.0"),
+        .package(url: "https://github.com/apple/swift-nio-ssl", from: "2.24.0"),
+        .package(url: "https://github.com/soto-project/soto", from: "6.5.0"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "1.4.0"),
+        .package(url: "https://github.com/FeatherCMS/hummingbird-aws", branch: "main"),
     ],
     targets: [
         .target(name: "HummingbirdMail", dependencies: [
             .product(name: "Hummingbird", package: "hummingbird"),
-            .target(name: "SES"),
-            .target(name: "SMTP"),
         ]),
-        .target(name: "MailKit", dependencies: [
-            .product(name: "NIO", package: "swift-nio")
-        ]),
-        .target(name: "SES", dependencies: [
-            .product(name: "NIO", package: "swift-nio"),
-            .product(name: "NIOSSL", package: "swift-nio-ssl"),
+        .target(name: "HummingbirdSES", dependencies: [
             .product(name: "SotoSES", package: "soto"),
-            .target(name: "MailKit")
+            .product(name: "HummingbirdAWS", package: "hummingbird-aws"),
+            .target(name: "HummingbirdMail"),
         ]),
-        .target(name: "SMTP", dependencies: [
+        .target(name: "HummingbirdSMTP", dependencies: [
+            .target(name: "NIOSMTP"),
+            .target(name: "HummingbirdMail"),
+        ]),
+        .target(name: "NIOSMTP", dependencies: [
             .product(name: "NIO", package: "swift-nio"),
             .product(name: "NIOSSL", package: "swift-nio-ssl"),
-            .target(name: "MailKit")
+            .product(name: "Logging", package: "swift-log"),
         ]),
-        .testTarget(name: "HBMailTests", dependencies: [
-            .product(name: "NIO", package: "swift-nio"),
-            .product(name: "NIOSSL", package: "swift-nio-ssl"),
-            .product(name: "SotoSES", package: "soto"),
-            .target(name: "SES"),
-            .target(name: "SMTP"),
-        ])
+
+        .testTarget(name: "NIOSMTPTests", dependencies: [
+            .target(name: "NIOSMTP"),
+        ]),
+        .testTarget(name: "HummingbirdSMTPTests", dependencies: [
+            .target(name: "HummingbirdSMTP"),
+        ]),
+        .testTarget(name: "HummingbirdSESTests", dependencies: [
+            .target(name: "HummingbirdSES"),
+        ]),
     ]
 )

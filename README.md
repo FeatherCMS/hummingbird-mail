@@ -70,4 +70,4 @@ let email = try Email(...)
 try await self.smtp.send(email)
 ```
 
-SMTP sending greatly inspired by [Mikroservices/Smtp](https://github.com/Mikroservices/Smtp)
+NIOSMTP is heavily inspired by [Mikroservices/Smtp](https://github.com/Mikroservices/Smtp)
