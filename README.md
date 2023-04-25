@@ -1,9 +1,9 @@
-##Feather Mail Component
+## Feather Mail Component
 
 A [Hummingbird](https://github.com/hummingbird-project/hummingbird) mail component, which handles email sending wih [AWS SES](https://aws.amazon.com/ses/) or with other [SMTP](https://hu.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol) providers.
 
 
-###AWS SES
+### AWS SES
 
 Simple usage
 
@@ -38,7 +38,7 @@ try await self.aws.mail.send(email)
 
 ```
 
-###SMTP
+### SMTP
 
 Simple usage
 
