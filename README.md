@@ -1,73 +1,108 @@
-## Feather Mail Component
+# Hummingbird Mail Component
 
-A [Hummingbird](https://github.com/hummingbird-project/hummingbird) mail component, which handles email sending wih [AWS SES](https://aws.amazon.com/ses/) or with other [SMTP](https://hu.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol) providers.
+A [Hummingbird](https://github.com/hummingbird-project/hummingbird) mail component, which can send emails using via [AWS SES](https://aws.amazon.com/ses/) or [SMTP](https://hu.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol) providers.
 
+## Getting started 
 
-### AWS SES
+Adding the dependency
+
+Add the following entry in your Package.swift to start using HummingbirdAWS:
+
+```swift
+.package(url: "https://github.com/feathercms/hummingbird-mail", from: "1.0.0"),
+```
+
+and HummingbirdMail dependency to your target:
+
+```swift
+.product(name: "HummingbirdMail", package: "hummingbird-mail"),
+```
+
+Mail provider services
+
+```swift
+.product(name: "HummingbirdSMTP", package: "hummingbird-mail"),
+.product(name: "HummingbirdSES", package: "hummingbird-mail"),
+```    
+
+## HummingbirdSES
 
 Simple usage
 
-```
-let email = try Email(...)
+```swift
+import Hummingbird
+import HummingbirdMail
+import HummingbirdSES
+
+let env = ProcessInfo.processInfo.environment
 let logger = Logger(label: "aws-logger")
-let eventLoopGroup = MultiThreadedEventLoopGroup(
-    numberOfThreads: System.coreCount
-)
-let client = AWSClient.init(
+
+let app = HBApplication()
+app.aws.client = .init(
     credentialProvider: .static(
-        accessKeyId: "#Your SES access key#",
-        secretAccessKey: "#Your SES secret access key#"
+        accessKeyId: env["SES_ID"]!,
+        secretAccessKey: env["SES_SECRET"]!
     ),
     httpClientProvider: .createNewWithEventLoopGroup(
-        eventLoopGroup
+        app.eventLoopGroup
     ),
     logger: logger
 )
-let sender = SESSender(
-    client: client,
-    region: .uswest1
+
+app.mail.sender = .ses(
+    client: app.aws.client,
+    region: .init(awsRegionName: env["SES_REGION"]!)!
 )
-try await sender.send(email)
-try client.syncShutdown()
-```
-or can use it as a Hummingbird extension
 
-```
-let email = try Email(...)
-try await self.aws.mail.send(email)
+let email = try Email(
+    from: Address(env["MAIL_FROM"]!),
+    to: [
+        Address(env["MAIL_TO"]!),
+    ],
+    subject: "test smtp",
+    body: "This is a <b>SMTP</b> test email body.",
+    isHtml: true
+)
 
+try await app.mail.sender.send(email)
+try app.shutdownApplication()
 ```
 
-### SMTP
+## SMTP
 
 Simple usage
 
-```
-let configuration = SMTPServerConfiguration(
-    hostname: "#Your SMTP host#",
+```swift
+import Hummingbird
+import HummingbirdMail
+import HummingbirdSMTP
+
+let env = ProcessInfo.processInfo.environment
+
+let app = HBApplication()
+app.mail.sender = .smtp(
+    eventLoopGroup: app.eventLoopGroup,
+    hostname: env["SMTP_HOST"]!,
     signInMethod: .credentials(
-        username: "#Your SMTP username#",
-        password: "#Your SMTP password#"
+        username: env["SMTP_USER"]!,
+        password: env["SMTP_PASS"]!
     )
 )
 
-let email = try Email(...)
-let eventLoopGroup = MultiThreadedEventLoopGroup(
-    numberOfThreads: System.coreCount
+let email = try Email(
+    from: Address(env["MAIL_FROM"]!),
+    to: [
+        Address(env["MAIL_TO"]!),
+    ],
+    subject: "test smtp",
+    body: "This is a <b>SMTP</b> test email body.",
+    isHtml: true
 )
-let sender = SMTPSender(
-    eventLoopGroup: eventLoopGroup,
-    configuration: configuration
-)
-try await sender.send(email) { message in print(message) }
-try sender.shutdown()
+
+try await app.mail.sender.send(email)
+try app.shutdownApplication()
 ```
 
-or can use it as a Hummingbird extension
+## Credits 
 
-```
-let email = try Email(...)
-try await self.smtp.send(email)
-```
-
-NIOSMTP is heavily inspired by [Mikroservices/Smtp](https://github.com/Mikroservices/Smtp)
+The NIOSMTP library is heavily inspired by [Mikroservices/Smtp](https://github.com/Mikroservices/Smtp).
