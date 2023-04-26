@@ -3,7 +3,7 @@ import HummingbirdAWS
 import HummingbirdMail
 import SotoSES
 
-public struct SESMail: HummingbirdMailService {
+public struct SESMailer {
 
     let ses: SES
 
@@ -22,7 +22,7 @@ public struct SESMail: HummingbirdMailService {
         )
     }
     
-    public func send(_ email: Email) async throws {
+    public func send(_ email: SESEmail) async throws {
         let rawMessage = SES.RawMessage(data: AWSBase64Data.base64(email.getSESRaw()))
         let rawRequest = SES.SendRawEmailRequest(rawMessage: rawMessage)
         _ = try await ses.sendRawEmail(rawRequest).get()

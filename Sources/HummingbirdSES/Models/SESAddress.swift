@@ -1,4 +1,4 @@
-public struct Address {
+public struct SESAddress {
     public let email: String
     public let name: String?
 
@@ -8,5 +8,12 @@ public struct Address {
     ) {
         self.email = email
         self.name = name
+    }
+    
+    var mime: String {
+        if let name {
+            return "\(name) <\(email)>"
+        }
+        return email
     }
 }
