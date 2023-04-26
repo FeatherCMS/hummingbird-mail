@@ -5,61 +5,69 @@ import Logging
 
 final class NIOSMTPTests: XCTestCase {
     
-    private let testFrom = "#add test email#"
-    private let testTo = "#add test email#"
+    var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
+    var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
     
     func testSimpleText() async throws {
         let email = try SMTPMail(
-            from: SMTPAddress(testFrom),
+            from: SMTPAddress(from),
             to: [
-                SMTPAddress(testTo),
+                SMTPAddress(to),
             ],
             subject: "test SMTP with simple text",
             body: "This is a simple text email body with SMTP."
         )
         
-        try await testSMTP(email)
+        try await send(email)
     }
     
     func testHMTLText() async throws {
         let email = try SMTPMail(
-            from: SMTPAddress(testFrom),
+            from: SMTPAddress(from),
             to: [
-                SMTPAddress(testTo),
+                SMTPAddress(to),
             ],
             subject: "test SMTP with HTML text",
             body: "This is a <b>HTML text</b> email body with SMTP.",
             isHtml: true
         )
         
-        try await testSMTP(email)
+        try await send(email)
     }
     
     func testAttachment() async throws {
-        let packageRootPath = URL(fileURLWithPath: #file)
-                                .pathComponents
-                                .prefix(while: { $0 != "Tests" })
-                                .joined(separator: "/")
-                                .dropFirst()
-        let assetsUrl = URL(fileURLWithPath: String(packageRootPath)).appendingPathComponent("Tests")
-                                                                     .appendingPathComponent("Assets")
-        let testData = try Data(contentsOf: assetsUrl.appendingPathComponent("cat.png"))
-        let attachment = SMTPAttachment(name: "cat.png", contentType: "image/png", data: testData)
+        let packageRootPath = URL(
+            fileURLWithPath: #file)
+            .pathComponents
+            .prefix(while: { $0 != "Tests" })
+            .joined(separator: "/")
+            .dropFirst()
+        let assetsUrl = URL(fileURLWithPath: String(packageRootPath))
+            .appendingPathComponent("Tests")
+            .appendingPathComponent("Assets")
+        let testData = try Data(
+            contentsOf: assetsUrl.appendingPathComponent("cat.png")
+        )
+        let attachment = SMTPAttachment(
+            name: "cat.png",
+            contentType: "image/png",
+            data: testData
+        )
 
         let email = try SMTPMail(
-            from: SMTPAddress(testFrom),
+            from: SMTPAddress(from),
             to: [
-                SMTPAddress(testTo),
+                SMTPAddress(to),
             ],
             subject: "test SMTP with attachment",
             body: "This is an email body and attachment with SMTP.",
             attachments: [attachment]
         )
         
-        try await testSMTP(email)
+        try await send(email)
     }
     
-    private func testSMTP(_ email: SMTPMail) async throws {
+    private func send(_ email: SMTPMail) async throws {
         let env = ProcessInfo.processInfo.environment
 
         let configuration = SMTPConfiguration(

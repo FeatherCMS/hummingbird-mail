@@ -8,14 +8,14 @@ import Logging
 
 final class HummingbirdSESTests: XCTestCase {
     
-    private let testFrom = "#add test email#"
-    private let testTo = "#add test email#"
+    var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
+    var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
     
     func testSimpleText() async throws {
         let email = try Email(
-            from: Address(testFrom),
+            from: Address(from),
             to: [
-                Address(testTo),
+                Address(to),
             ],
             subject: "test ses with simple text",
             body: "This is a simple text email body with SES."
@@ -26,9 +26,9 @@ final class HummingbirdSESTests: XCTestCase {
     
     func testHMTLText() async throws {
         let email = try Email(
-            from: Address(testFrom),
+            from: Address(from),
             to: [
-                Address(testTo),
+                Address(to),
             ],
             subject: "test ses with HTML text",
             body: "This is a <b>HTML text</b> email body with SES.",
@@ -39,20 +39,28 @@ final class HummingbirdSESTests: XCTestCase {
     }
     
     func testAttachment() async throws {
-        let packageRootPath = URL(fileURLWithPath: #file)
-                                .pathComponents
-                                .prefix(while: { $0 != "Tests" })
-                                .joined(separator: "/")
-                                .dropFirst()
-        let assetsUrl = URL(fileURLWithPath: String(packageRootPath)).appendingPathComponent("Tests")
-                                                                     .appendingPathComponent("Assets")
-        let testData = try Data(contentsOf: assetsUrl.appendingPathComponent("cat.png"))
-        let attachment = Attachment(name: "cat.png", contentType: "image/png", data: testData)
+        let packageRootPath = URL(
+            fileURLWithPath: #file)
+            .pathComponents
+            .prefix(while: { $0 != "Tests" })
+            .joined(separator: "/")
+            .dropFirst()
+        let assetsUrl = URL(fileURLWithPath: String(packageRootPath))
+            .appendingPathComponent("Tests")
+            .appendingPathComponent("Assets")
+        let testData = try Data(
+            contentsOf: assetsUrl.appendingPathComponent("cat.png")
+        )
+        let attachment = Attachment(
+            name: "cat.png",
+            contentType: "image/png",
+            data: testData
+        )
 
         let email = try Email(
-            from: Address(testFrom),
+            from: Address(from),
             to: [
-                Address(testTo),
+                Address(to),
             ],
             subject: "test ses with attachment",
             body: "This is an email body and attachment with SES.",
@@ -92,5 +100,4 @@ final class HummingbirdSESTests: XCTestCase {
         try await app.mail.sender.send(email)
         try app.shutdownApplication()
     }
-    
 }

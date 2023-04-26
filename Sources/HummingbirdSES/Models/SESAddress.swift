@@ -1,8 +1,8 @@
-public struct SESAddress {
-    public let email: String
-    public let name: String?
+struct SESAddress {
+    let email: String
+    let name: String?
 
-    public init(
+    init(
         _ email: String,
         name: String? = nil
     ) {

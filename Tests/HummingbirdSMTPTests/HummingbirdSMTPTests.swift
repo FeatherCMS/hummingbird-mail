@@ -7,14 +7,14 @@ import Logging
 
 final class HummingbirdMTPTests: XCTestCase {
     
-    private let testFrom = "#add test email#"
-    private let testTo = "#add test email#"
+    var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
+    var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
     
     func testSimpleText() async throws {
         let email = try Email(
-            from: Address(testFrom),
+            from: Address(from),
             to: [
-                Address(testTo),
+                Address(to),
             ],
             subject: "test SMTP with simple text",
             body: "This is a simple text email body with SMTP."
@@ -25,9 +25,9 @@ final class HummingbirdMTPTests: XCTestCase {
     
     func testHMTLText() async throws {
         let email = try Email(
-            from: Address(testFrom),
+            from: Address(from),
             to: [
-                Address(testTo),
+                Address(to),
             ],
             subject: "test SMTP with HTML text",
             body: "This is a <b>HTML text</b> email body with SMTP.",
@@ -38,20 +38,28 @@ final class HummingbirdMTPTests: XCTestCase {
     }
     
     func testAttachment() async throws {
-        let packageRootPath = URL(fileURLWithPath: #file)
-                                .pathComponents
-                                .prefix(while: { $0 != "Tests" })
-                                .joined(separator: "/")
-                                .dropFirst()
-        let assetsUrl = URL(fileURLWithPath: String(packageRootPath)).appendingPathComponent("Tests")
-                                                                     .appendingPathComponent("Assets")
-        let testData = try Data(contentsOf: assetsUrl.appendingPathComponent("cat.png"))
-        let attachment = Attachment(name: "cat.png", contentType: "image/png", data: testData)
+        let packageRootPath = URL(
+            fileURLWithPath: #file)
+            .pathComponents
+            .prefix(while: { $0 != "Tests" })
+            .joined(separator: "/")
+            .dropFirst()
+        let assetsUrl = URL(fileURLWithPath: String(packageRootPath))
+            .appendingPathComponent("Tests")
+            .appendingPathComponent("Assets")
+        let testData = try Data(
+            contentsOf: assetsUrl.appendingPathComponent("cat.png")
+        )
+        let attachment = Attachment(
+            name: "cat.png",
+            contentType: "image/png",
+            data: testData
+        )
 
         let email = try Email(
-            from: Address(testFrom),
+            from: Address(from),
             to: [
-                Address(testTo),
+                Address(to),
             ],
             subject: "test SMTP with attachment",
             body: "This is an email body and attachment with SMTP.",

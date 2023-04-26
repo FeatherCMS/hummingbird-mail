@@ -1,11 +1,11 @@
 import Foundation
 
-public struct SESAttachment {
-    public let name: String
-    public let contentType: String
-    public let data: Data
+struct SESAttachment {
+    let name: String
+    let contentType: String
+    let data: Data
 
-    public init(
+    init(
         name: String,
         contentType: String,
         data: Data

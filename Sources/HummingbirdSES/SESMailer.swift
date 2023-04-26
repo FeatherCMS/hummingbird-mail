@@ -21,11 +21,10 @@ public struct SESMailer {
             options: []
         )
     }
-    
-    public func send(_ email: SESEmail) async throws {
+
+    func send(_ email: SESEmail) async throws {
         let rawMessage = SES.RawMessage(data: AWSBase64Data.base64(email.getSESRaw()))
         let rawRequest = SES.SendRawEmailRequest(rawMessage: rawMessage)
         _ = try await ses.sendRawEmail(rawRequest).get()
     }
-
 }

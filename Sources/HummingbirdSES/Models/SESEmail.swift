@@ -1,21 +1,21 @@
 import Foundation
 
-public struct SESEmail {
-    public let from: SESAddress
-    public let to: [SESAddress]
-    public let cc: [SESAddress]
-    public let bcc: [SESAddress]
-    public let subject: String
-    public let body: String
-    public let isHtml: Bool
-    public let replyTo: [SESAddress]
-    public let reference: String?
-    public let attachments: [SESAttachment]
+struct SESEmail {
+    let from: SESAddress
+    let to: [SESAddress]
+    let cc: [SESAddress]
+    let bcc: [SESAddress]
+    let subject: String
+    let body: String
+    let isHtml: Bool
+    let replyTo: [SESAddress]
+    let reference: String?
+    let attachments: [SESAttachment]
     
     let dateFormatted: String
     let uuid: String
 
-    public init(
+    init(
         from: SESAddress,
         to: [SESAddress] = [],
         cc: [SESAddress] = [],
@@ -52,7 +52,7 @@ public struct SESEmail {
         uuid = "<\(date.timeIntervalSince1970)\(from.email.drop { $0 != "@" })>"
     }
     
-    public func getSESRaw() -> String {
+    func getSESRaw() -> String {
         
         var out: String = ""
         out += "From: \(from.mime)\r\n"
