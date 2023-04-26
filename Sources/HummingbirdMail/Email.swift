@@ -9,7 +9,7 @@ public struct Email {
     public let replyTo: [Address]
     public let reference: String?
     public let attachments: [Attachment]
-
+    
     public init(
         from: Address,
         to: [Address] = [],
@@ -36,4 +36,5 @@ public struct Email {
         self.reference = reference
         self.attachments = attachments
     }
+    
 }
