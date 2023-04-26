@@ -8,6 +8,31 @@ final class NIOSMTPTests: XCTestCase {
     var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
     var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
     
+    private func send(_ email: SMTPMail) async throws {
+        let env = ProcessInfo.processInfo.environment
+
+        let configuration = SMTPConfiguration(
+            hostname: env["SMTP_HOST"]!,
+            signInMethod: .credentials(
+                username: env["SMTP_USER"]!,
+                password: env["SMTP_PASS"]!
+            )
+        )
+        
+        let eventLoopGroup = MultiThreadedEventLoopGroup(
+            numberOfThreads: 1
+        )
+        let smtp = NIOSMTP(
+            eventLoopGroup: eventLoopGroup,
+            configuration: configuration,
+            logger: .init(label: "nio-smtp")
+        )
+        try await smtp.send(email)
+        try smtp.shutdown()
+    }
+    
+    // MARK: - test cases
+
     func testSimpleText() async throws {
         let email = try SMTPMail(
             from: SMTPAddress(from),
@@ -17,7 +42,6 @@ final class NIOSMTPTests: XCTestCase {
             subject: "test SMTP with simple text",
             body: "This is a simple text email body with SMTP."
         )
-        
         try await send(email)
     }
     
@@ -31,7 +55,6 @@ final class NIOSMTPTests: XCTestCase {
             body: "This is a <b>HTML text</b> email body with SMTP.",
             isHtml: true
         )
-        
         try await send(email)
     }
     
@@ -63,30 +86,6 @@ final class NIOSMTPTests: XCTestCase {
             body: "This is an email body and attachment with SMTP.",
             attachments: [attachment]
         )
-        
         try await send(email)
-    }
-    
-    private func send(_ email: SMTPMail) async throws {
-        let env = ProcessInfo.processInfo.environment
-
-        let configuration = SMTPConfiguration(
-            hostname: env["SMTP_HOST"]!,
-            signInMethod: .credentials(
-                username: env["SMTP_USER"]!,
-                password: env["SMTP_PASS"]!
-            )
-        )
-        
-        let eventLoopGroup = MultiThreadedEventLoopGroup(
-            numberOfThreads: 1
-        )
-        let smtp = NIOSMTP(
-            eventLoopGroup: eventLoopGroup,
-            configuration: configuration,
-            logger: .init(label: "nio-smtp")
-        )
-        try await smtp.send(email)
-        try smtp.shutdown()
     }
 }

@@ -11,6 +11,39 @@ final class HummingbirdSESTests: XCTestCase {
     var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
     var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
     
+    private func send(_ email: Email) async throws {
+        let env = ProcessInfo.processInfo.environment
+        
+        var logger = Logger(label: "aws-logger")
+        logger.logLevel = .info
+        
+        let app = HBApplication()
+        app.aws.client = .init(
+            credentialProvider: .static(
+                accessKeyId: env["SES_ID"]!,
+                secretAccessKey: env["SES_SECRET"]!
+            ),
+            options: .init(
+                requestLogLevel: .info,
+                errorLogLevel: .info
+            ),
+            httpClientProvider: .createNewWithEventLoopGroup(
+                app.eventLoopGroup
+            ),
+            logger: logger
+        )
+
+        app.mail.sender = .ses(
+            client: app.aws.client,
+            region: .init(awsRegionName: env["SES_REGION"]!)!
+        )
+        
+        try await app.mail.sender.send(email)
+        try app.shutdownApplication()
+    }
+    
+    // MARK: - test cases
+    
     func testSimpleText() async throws {
         let email = try Email(
             from: Address(from),
@@ -20,8 +53,7 @@ final class HummingbirdSESTests: XCTestCase {
             subject: "test ses with simple text",
             body: "This is a simple text email body with SES."
         )
-        
-        try await testSES(email)
+        try await send(email)
     }
     
     func testHMTLText() async throws {
@@ -34,8 +66,7 @@ final class HummingbirdSESTests: XCTestCase {
             body: "This is a <b>HTML text</b> email body with SES.",
             isHtml: true
         )
-        
-        try await testSES(email)
+        try await send(email)
     }
     
     func testAttachment() async throws {
@@ -66,38 +97,6 @@ final class HummingbirdSESTests: XCTestCase {
             body: "This is an email body and attachment with SES.",
             attachments: [attachment]
         )
-        
-        try await testSES(email)
-    }
-    
-    private func testSES(_ email: Email) async throws {
-        let env = ProcessInfo.processInfo.environment
-        
-        var logger = Logger(label: "aws-logger")
-        logger.logLevel = .info
-        
-        let app = HBApplication()
-        app.aws.client = .init(
-            credentialProvider: .static(
-                accessKeyId: env["SES_ID"]!,
-                secretAccessKey: env["SES_SECRET"]!
-            ),
-            options: .init(
-                requestLogLevel: .info,
-                errorLogLevel: .info
-            ),
-            httpClientProvider: .createNewWithEventLoopGroup(
-                app.eventLoopGroup
-            ),
-            logger: logger
-        )
-
-        app.mail.sender = .ses(
-            client: app.aws.client,
-            region: .init(awsRegionName: env["SES_REGION"]!)!
-        )
-        
-        try await app.mail.sender.send(email)
-        try app.shutdownApplication()
+        try await send(email)
     }
 }

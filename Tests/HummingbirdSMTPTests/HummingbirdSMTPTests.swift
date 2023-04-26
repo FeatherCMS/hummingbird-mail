@@ -10,6 +10,25 @@ final class HummingbirdMTPTests: XCTestCase {
     var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
     var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
     
+    private func send(_ email: Email) async throws {
+        let env = ProcessInfo.processInfo.environment
+
+        let app = HBApplication()
+        app.mail.sender = .smtp(
+            eventLoopGroup: app.eventLoopGroup,
+            hostname: env["SMTP_HOST"]!,
+            signInMethod: .credentials(
+                username: env["SMTP_USER"]!,
+                password: env["SMTP_PASS"]!
+            )
+        )
+
+        try await app.mail.sender.send(email)
+        try app.shutdownApplication()
+    }
+    
+    // MARK: - test cases
+
     func testSimpleText() async throws {
         let email = try Email(
             from: Address(from),
@@ -19,8 +38,7 @@ final class HummingbirdMTPTests: XCTestCase {
             subject: "test SMTP with simple text",
             body: "This is a simple text email body with SMTP."
         )
-        
-        try await testSMTP(email)
+        try await send(email)
     }
     
     func testHMTLText() async throws {
@@ -33,8 +51,7 @@ final class HummingbirdMTPTests: XCTestCase {
             body: "This is a <b>HTML text</b> email body with SMTP.",
             isHtml: true
         )
-        
-        try await testSMTP(email)
+        try await send(email)
     }
     
     func testAttachment() async throws {
@@ -65,24 +82,6 @@ final class HummingbirdMTPTests: XCTestCase {
             body: "This is an email body and attachment with SMTP.",
             attachments: [attachment]
         )
-        
-        try await testSMTP(email)
-    }
-    
-    private func testSMTP(_ email: Email) async throws {
-        let env = ProcessInfo.processInfo.environment
-
-        let app = HBApplication()
-        app.mail.sender = .smtp(
-            eventLoopGroup: app.eventLoopGroup,
-            hostname: env["SMTP_HOST"]!,
-            signInMethod: .credentials(
-                username: env["SMTP_USER"]!,
-                password: env["SMTP_PASS"]!
-            )
-        )
-
-        try await app.mail.sender.send(email)
-        try app.shutdownApplication()
+        try await send(email)
     }
 }
