@@ -7,7 +7,61 @@ import Logging
 
 final class HummingbirdMTPTests: XCTestCase {
     
-    func testSMTP() async throws {
+    private let testFrom = "#add test email#"
+    private let testTo = "#add test email#"
+    
+    func testSimpleText() async throws {
+        let email = try Email(
+            from: Address(testFrom),
+            to: [
+                Address(testTo),
+            ],
+            subject: "test SMTP with simple text",
+            body: "This is a simple text email body with SMTP."
+        )
+        
+        try await testSMTP(email)
+    }
+    
+    func testHMTLText() async throws {
+        let email = try Email(
+            from: Address(testFrom),
+            to: [
+                Address(testTo),
+            ],
+            subject: "test SMTP with HTML text",
+            body: "This is a <b>HTML text</b> email body with SMTP.",
+            isHtml: true
+        )
+        
+        try await testSMTP(email)
+    }
+    
+    func testAttachment() async throws {
+        let packageRootPath = URL(fileURLWithPath: #file)
+                                .pathComponents
+                                .prefix(while: { $0 != "Tests" })
+                                .joined(separator: "/")
+                                .dropFirst()
+        let assetsUrl = URL(fileURLWithPath: String(packageRootPath)).appendingPathComponent("Tests")
+                                                                     .appendingPathComponent("Assets")
+        let testData = try Data(contentsOf: assetsUrl.appendingPathComponent("cat.png"))
+        let attachment = Attachment(name: "cat.png", contentType: "image/png", data: testData)
+
+        let email = try Email(
+            from: Address(testFrom),
+            to: [
+                Address(testTo),
+            ],
+            subject: "test SMTP with attachment",
+            body: "This is an email body and attachment with SMTP.",
+            attachments: [attachment]
+        )
+        
+        try await testSMTP(email)
+    }
+    
+    private func testSMTP(_ email: Email) async throws {
         let env = ProcessInfo.processInfo.environment
 
         let app = HBApplication()
@@ -18,16 +72,6 @@ final class HummingbirdMTPTests: XCTestCase {
                 username: env["SMTP_USER"]!,
                 password: env["SMTP_PASS"]!
             )
-        )
-
-        let email = try Email(
-            from: Address(env["MAIL_FROM"]!),
-            to: [
-                Address(env["MAIL_TO"]!),
-            ],
-            subject: "test smtp",
-            body: "This is a <b>SMTP</b> test email body.",
-            isHtml: true
         )
 
         try await app.mail.sender.send(email)

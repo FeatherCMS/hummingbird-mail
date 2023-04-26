@@ -23,28 +23,9 @@ public struct SESMail: HummingbirdMailService {
     }
     
     public func send(_ email: Email) async throws {
-        let msg: SES.Body
-        if email.isHtml {
-            msg = .init(html: .init(data: email.body))
-        }
-        else {
-            msg = .init(text: .init(data: email.body))
-        }
-        // TODO: attachment support
-        _ = try await ses.sendEmail(
-            .init(
-                destination: .init(
-                    bccAddresses: email.bcc.map(\.email),
-                    ccAddresses: email.cc.map(\.email),
-                    toAddresses: email.to.map(\.email)
-                ),
-                message: .init(
-                    body: msg,
-                    subject: .init(data: email.subject)
-                ),
-                replyToAddresses: email.replyTo.map(\.email),
-                source: email.from.email
-            )
-        ).get()
+        let rawMessage = SES.RawMessage(data: AWSBase64Data.base64(email.getSESRaw()))
+        let rawRequest = SES.SendRawEmailRequest(rawMessage: rawMessage)
+        _ = try await ses.sendRawEmail(rawRequest).get()
     }
+
 }
