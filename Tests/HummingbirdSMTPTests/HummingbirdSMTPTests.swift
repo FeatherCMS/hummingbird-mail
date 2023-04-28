@@ -55,8 +55,7 @@ final class HummingbirdMTPTests: XCTestCase {
     }
     
     func testAttachment() async throws {
-        let packageRootPath = URL(
-            fileURLWithPath: #file)
+        let packageRootPath = URL(fileURLWithPath: #file)
             .pathComponents
             .prefix(while: { $0 != "Tests" })
             .joined(separator: "/")
@@ -65,10 +64,10 @@ final class HummingbirdMTPTests: XCTestCase {
             .appendingPathComponent("Tests")
             .appendingPathComponent("Assets")
         let testData = try Data(
-            contentsOf: assetsUrl.appendingPathComponent("cat.png")
+            contentsOf: assetsUrl.appendingPathComponent("Hummingbird.png")
         )
         let attachment = Attachment(
-            name: "cat.png",
+            name: "Hummingbird.png",
             contentType: "image/png",
             data: testData
         )

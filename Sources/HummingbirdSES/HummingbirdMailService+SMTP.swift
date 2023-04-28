@@ -1,7 +1,7 @@
 import NIO
 import Logging
 import HummingbirdMail
-import SotoSES
+import SotoSESv2
 
 public extension HummingbirdMailService where Self == SESMailer {
 

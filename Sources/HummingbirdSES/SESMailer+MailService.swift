@@ -1,7 +1,7 @@
 import Hummingbird
 import HummingbirdAWS
 import HummingbirdMail
-import SotoSES
+import SotoSESv2
 
 extension SESMailer: HummingbirdMailService {
     

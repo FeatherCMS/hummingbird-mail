@@ -1,11 +1,12 @@
 import Hummingbird
 import HummingbirdAWS
 import HummingbirdMail
-import SotoSES
+import SotoCore
+import SotoSESv2
 
 public struct SESMailer {
 
-    let ses: SES
+    let ses: SESv2
 
     init(
         client: AWSClient,
@@ -23,8 +24,8 @@ public struct SESMailer {
     }
 
     func send(_ email: SESEmail) async throws {
-        let rawMessage = SES.RawMessage(data: AWSBase64Data.base64(email.getSESRaw()))
-        let rawRequest = SES.SendRawEmailRequest(rawMessage: rawMessage)
-        _ = try await ses.sendRawEmail(rawRequest).get()
+        let rawMessage = SESv2.RawMessage(data: AWSBase64Data.base64(email.getSESRaw()))
+        let request = SESv2.SendEmailRequest(content: .init(raw: rawMessage))
+        _ = try await ses.sendEmail(request)
     }
 }

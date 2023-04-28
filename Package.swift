@@ -16,7 +16,8 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log", from: "1.5.0"),
         .package(url: "https://github.com/apple/swift-nio", from: "2.51.0"),
         .package(url: "https://github.com/apple/swift-nio-ssl", from: "2.24.0"),
-        .package(url: "https://github.com/soto-project/soto", from: "6.5.0"),
+        .package(url: "https://github.com/soto-project/soto-core", from: "6.5.0"),
+        .package(url: "https://github.com/soto-project/soto-codegenerator", from: "0.6.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "1.4.0"),
         .package(url: "https://github.com/FeatherCMS/hummingbird-aws", branch: "main"),
     ],
@@ -25,14 +26,26 @@ let package = Package(
             .product(name: "Hummingbird", package: "hummingbird"),
         ]),
         .target(name: "HummingbirdSES", dependencies: [
-            .product(name: "SotoSES", package: "soto"),
             .product(name: "HummingbirdAWS", package: "hummingbird-aws"),
             .target(name: "HummingbirdMail"),
+            .target(name: "SotoSESv2")
         ]),
         .target(name: "HummingbirdSMTP", dependencies: [
             .target(name: "NIOSMTP"),
             .target(name: "HummingbirdMail"),
         ]),
+        .target(
+            name: "SotoSESv2",
+            dependencies: [
+                .product(name: "SotoCore", package: "soto-core"),
+            ],
+            plugins: [
+                .plugin(
+                    name: "SotoCodeGeneratorPlugin",
+                    package: "soto-codegenerator"
+                ),
+            ]
+        ),
         .target(name: "NIOSMTP", dependencies: [
             .product(name: "NIO", package: "swift-nio"),
             .product(name: "NIOSSL", package: "swift-nio-ssl"),
