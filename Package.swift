@@ -17,7 +17,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio", from: "2.51.0"),
         .package(url: "https://github.com/apple/swift-nio-ssl", from: "2.24.0"),
         .package(url: "https://github.com/soto-project/soto-core", from: "6.5.0"),
-        .package(url: "https://github.com/soto-project/soto-codegenerator", from: "0.6.0"),
+        .package(url: "https://github.com/soto-project/soto-codegenerator", from: "0.8.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "1.4.0"),
         .package(url: "https://github.com/FeatherCMS/hummingbird-aws", branch: "main"),
     ],
