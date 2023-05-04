@@ -4,16 +4,16 @@ import HummingbirdMail
 import SotoCore
 import SotoSESv2
 
-public struct SESMailer {
+struct HBSESMailerService: HBMailerService {
 
     let ses: SESv2
 
     init(
-        client: AWSClient,
+        aws: AWSClient,
         region: Region
     ) {
         self.ses = .init(
-            client: client,
+            client: aws,
             region: region,
             partition: .aws,
             endpoint: nil,
@@ -23,9 +23,15 @@ public struct SESMailer {
         )
     }
 
-    func send(_ email: SESEmail) async throws {
-        let rawMessage = SESv2.RawMessage(data: AWSBase64Data.base64(email.getSESRaw()))
-        let request = SESv2.SendEmailRequest(content: .init(raw: rawMessage))
-        _ = try await ses.sendEmail(request)
+    func make(
+        logger: Logger,
+        eventLoop: EventLoop
+    ) -> HBMailer {
+        HBSESMailer(
+            service: self,
+            logger: logger,
+            eventLoop: eventLoop
+        )
     }
 }
+

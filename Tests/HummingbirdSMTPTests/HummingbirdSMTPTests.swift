@@ -10,11 +10,11 @@ final class HummingbirdMTPTests: XCTestCase {
     var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
     var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
     
-    private func send(_ email: Email) async throws {
+    private func send(_ email: HBMail) async throws {
         let env = ProcessInfo.processInfo.environment
 
         let app = HBApplication()
-        app.mail.sender = .smtp(
+        app.services.setUpSMTPMailer(
             eventLoopGroup: app.eventLoopGroup,
             hostname: env["SMTP_HOST"]!,
             signInMethod: .credentials(
@@ -23,17 +23,17 @@ final class HummingbirdMTPTests: XCTestCase {
             )
         )
 
-        try await app.mail.sender.send(email)
+        try await app.mailer.send(email)
         try app.shutdownApplication()
     }
     
     // MARK: - test cases
 
     func testSimpleText() async throws {
-        let email = try Email(
-            from: Address(from),
+        let email = try HBMail(
+            from: HBMailAddress(from),
             to: [
-                Address(to),
+                HBMailAddress(to),
             ],
             subject: "test SMTP with simple text",
             body: "This is a simple text email body with SMTP."
@@ -42,10 +42,10 @@ final class HummingbirdMTPTests: XCTestCase {
     }
     
     func testHMTLText() async throws {
-        let email = try Email(
-            from: Address(from),
+        let email = try HBMail(
+            from: HBMailAddress(from),
             to: [
-                Address(to),
+                HBMailAddress(to),
             ],
             subject: "test SMTP with HTML text",
             body: "This is a <b>HTML text</b> email body with SMTP.",
@@ -66,16 +66,16 @@ final class HummingbirdMTPTests: XCTestCase {
         let testData = try Data(
             contentsOf: assetsUrl.appendingPathComponent("Hummingbird.png")
         )
-        let attachment = Attachment(
+        let attachment = HBMailAttachment(
             name: "Hummingbird.png",
             contentType: "image/png",
             data: testData
         )
 
-        let email = try Email(
-            from: Address(from),
+        let email = try HBMail(
+            from: HBMailAddress(from),
             to: [
-                Address(to),
+                HBMailAddress(to),
             ],
             subject: "test SMTP with attachment",
             body: "This is an email body and attachment with SMTP.",

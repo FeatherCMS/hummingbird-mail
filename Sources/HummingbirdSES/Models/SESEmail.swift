@@ -52,8 +52,7 @@ struct SESEmail {
         uuid = "<\(date.timeIntervalSince1970)\(from.email.drop { $0 != "@" })>"
     }
     
-    func getSESRaw() -> String {
-        
+    var rawValue: String {
         var out: String = ""
         out += "From: \(from.mime)\r\n"
 

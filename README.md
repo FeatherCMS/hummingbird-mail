@@ -38,7 +38,7 @@ let env = ProcessInfo.processInfo.environment
 let logger = Logger(label: "aws-logger")
 
 let app = HBApplication()
-app.aws.client = .init(
+app.services.aws = .init(
     credentialProvider: .static(
         accessKeyId: env["SES_ID"]!,
         secretAccessKey: env["SES_SECRET"]!
@@ -49,23 +49,21 @@ app.aws.client = .init(
     logger: logger
 )
 
-app.mail.sender = .ses(
-    client: app.aws.client,
-    region: .init(awsRegionName: env["SES_REGION"]!)!
+app.services.setUpSESMailer(
+    using: app.aws,
+    region: env["SES_REGION"]!
 )
 
-let email = try Email(
-    from: Address(env["MAIL_FROM"]!),
+let email = try HBMail(
+    from: HBMailAddress(env["MAIL_FROM]!),
     to: [
-        Address(env["MAIL_TO"]!),
+        HBMailAddress(env["MAIL_TO]!),
     ],
-    subject: "test smtp",
-    body: "This is a <b>SMTP</b> test email body.",
-    isHtml: true
+    subject: "test ses with simple text",
+    body: "This is a simple text email body with SES."
 )
 
-try await app.mail.sender.send(email)
-try app.shutdownApplication()
+try await app.mailer.send(email)
 ```
 
 ## SMTP
@@ -80,7 +78,7 @@ import HummingbirdSMTP
 let env = ProcessInfo.processInfo.environment
 
 let app = HBApplication()
-app.mail.sender = .smtp(
+app.services.setUpSMTPMailer(
     eventLoopGroup: app.eventLoopGroup,
     hostname: env["SMTP_HOST"]!,
     signInMethod: .credentials(
@@ -89,18 +87,16 @@ app.mail.sender = .smtp(
     )
 )
 
-let email = try Email(
-    from: Address(env["MAIL_FROM"]!),
+let email = try HBMail(
+    from: HBMailAddress(env["MAIL_FROM]!),
     to: [
-        Address(env["MAIL_TO"]!),
+        HBMailAddress(env["MAIL_TO]!),
     ],
-    subject: "test smtp",
-    body: "This is a <b>SMTP</b> test email body.",
-    isHtml: true
+    subject: "test ses with simple text",
+    body: "This is a simple text email body with SES."
 )
 
-try await app.mail.sender.send(email)
-try app.shutdownApplication()
+try await app.mailer.send(email)
 ```
 
 ## Credits 

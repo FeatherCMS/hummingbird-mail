@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "hummingbird-mail",
     platforms: [
-       .macOS(.v10_15),
+       .macOS(.v12),
     ],
     products: [
         .library(name: "HummingbirdMail", targets: ["HummingbirdMail"]),
@@ -20,10 +20,12 @@ let package = Package(
         .package(url: "https://github.com/soto-project/soto-codegenerator", from: "0.8.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "1.4.0"),
         .package(url: "https://github.com/FeatherCMS/hummingbird-aws", branch: "main"),
+        .package(url: "https://github.com/FeatherCMS/hummingbird-services", branch: "main"),
     ],
     targets: [
         .target(name: "HummingbirdMail", dependencies: [
             .product(name: "Hummingbird", package: "hummingbird"),
+            .product(name: "HummingbirdServices", package: "hummingbird-services"),
         ]),
         .target(name: "HummingbirdSES", dependencies: [
             .product(name: "HummingbirdAWS", package: "hummingbird-aws"),
