@@ -1,4 +1,4 @@
-public struct Address {
+public struct HBMailAddress {
     public let email: String
     public let name: String?
 

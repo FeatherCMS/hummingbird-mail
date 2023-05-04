@@ -6,16 +6,19 @@ import HummingbirdSES
 import SotoCore
 import Logging
 
-final class HummingbirdMTPTests: XCTestCase {
+final class HummingbirdSESTests: XCTestCase {
     
-    func testSMTP() async throws {
+    var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
+    var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
+    
+    private func send(_ email: HBMail) async throws {
         let env = ProcessInfo.processInfo.environment
-
+        
         var logger = Logger(label: "aws-logger")
         logger.logLevel = .info
         
         let app = HBApplication()
-        app.aws.client = .init(
+        app.services.aws = .init(
             credentialProvider: .static(
                 accessKeyId: env["SES_ID"]!,
                 secretAccessKey: env["SES_SECRET"]!
@@ -30,22 +33,69 @@ final class HummingbirdMTPTests: XCTestCase {
             logger: logger
         )
 
-        app.mail.sender = .ses(
-            client: app.aws.client,
-            region: .init(awsRegionName: env["SES_REGION"]!)!
+        app.services.setUpSESMailer(
+            using: app.aws,
+            region: env["SES_REGION"]!
         )
-
-        let email = try Email(
-            from: Address(env["MAIL_FROM"]!),
+        
+        try await app.mailer.send(email)
+        try app.shutdownApplication()
+    }
+    
+    // MARK: - test cases
+    
+    func testSimpleText() async throws {
+        let email = try HBMail(
+            from: HBMailAddress(from),
             to: [
-                Address(env["MAIL_TO"]!),
+                HBMailAddress(to),
             ],
-            subject: "test smtp",
-            body: "This is a <b>SMTP</b> test email body.",
+            subject: "test ses with simple text",
+            body: "This is a simple text email body with SES."
+        )
+        try await send(email)
+    }
+    
+    func testHMTLText() async throws {
+        let email = try HBMail(
+            from: HBMailAddress(from),
+            to: [
+                HBMailAddress(to),
+            ],
+            subject: "test ses with HTML text",
+            body: "This is a <b>HTML text</b> email body with SES.",
             isHtml: true
         )
+        try await send(email)
+    }
+    
+    func testAttachment() async throws {
+        let packageRootPath = URL(fileURLWithPath: #file)
+            .pathComponents
+            .prefix(while: { $0 != "Tests" })
+            .joined(separator: "/")
+            .dropFirst()
+        let assetsUrl = URL(fileURLWithPath: String(packageRootPath))
+            .appendingPathComponent("Tests")
+            .appendingPathComponent("Assets")
+        let testData = try Data(
+            contentsOf: assetsUrl.appendingPathComponent("Hummingbird.png")
+        )
+        let attachment = HBMailAttachment(
+            name: "Hummingbird.png",
+            contentType: "image/png",
+            data: testData
+        )
 
-        try await app.mail.sender.send(email)
-        try app.shutdownApplication()
+        let email = try HBMail(
+            from: HBMailAddress(from),
+            to: [
+                HBMailAddress(to),
+            ],
+            subject: "test ses with attachment",
+            body: "This is an email body and attachment with SES.",
+            attachments: [attachment]
+        )
+        try await send(email)
     }
 }

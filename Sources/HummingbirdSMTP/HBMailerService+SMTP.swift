@@ -1,11 +1,13 @@
-import NIO
-import NIOSMTP
-import Logging
+import Hummingbird
+import HummingbirdServices
 import HummingbirdMail
+import Logging
+@_exported import NIOSMTP
 
-public extension HummingbirdMailService where Self == NIOSMTP {
 
-    static func smtp(
+public extension HBApplication.Services {
+
+    func setUpSMTPMailer(
         eventLoopGroup: EventLoopGroup,
         hostname: String,
         port: Int = 587,
@@ -14,18 +16,15 @@ public extension HummingbirdMailService where Self == NIOSMTP {
         timeout: TimeAmount = .seconds(10),
         helloMethod: HelloMethod = .helo,
         logger: Logger? = nil
-    ) -> HummingbirdMailService {
-        let configuration = SMTPConfiguration(
+    ) {
+        mailer = HBSMTPMailerService(
+            eventLoopGroup: eventLoopGroup,
             hostname: hostname,
             port: port,
             signInMethod: signInMethod,
             security: security,
             timeout: timeout,
-            helloMethod: helloMethod
-        )
-        return NIOSMTP(
-            eventLoopGroup: eventLoopGroup,
-            configuration: configuration,
+            helloMethod: helloMethod,
             logger: logger
         )
     }

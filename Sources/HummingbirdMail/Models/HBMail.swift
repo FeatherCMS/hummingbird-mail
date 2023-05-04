@@ -1,29 +1,29 @@
-public struct Email {
-    public let from: Address
-    public let to: [Address]
-    public let cc: [Address]
-    public let bcc: [Address]
+public struct HBMail {
+    public let from: HBMailAddress
+    public let to: [HBMailAddress]
+    public let cc: [HBMailAddress]
+    public let bcc: [HBMailAddress]
     public let subject: String
     public let body: String
     public let isHtml: Bool
-    public let replyTo: [Address]
+    public let replyTo: [HBMailAddress]
     public let reference: String?
-    public let attachments: [Attachment]
-
+    public let attachments: [HBMailAttachment]
+    
     public init(
-        from: Address,
-        to: [Address] = [],
-        cc: [Address] = [],
-        bcc: [Address] = [],
+        from: HBMailAddress,
+        to: [HBMailAddress] = [],
+        cc: [HBMailAddress] = [],
+        bcc: [HBMailAddress] = [],
         subject: String,
         body: String,
         isHtml: Bool = false,
-        replyTo: [Address] = [],
+        replyTo: [HBMailAddress] = [],
         reference: String? = nil,
-        attachments: [Attachment] = []
+        attachments: [HBMailAttachment] = []
     ) throws {
         guard !to.isEmpty || !cc.isEmpty || !bcc.isEmpty else {
-            throw HummingbirdMailError.recipientNotSpecified
+            throw HBMailerError.recipientNotSpecified
         }
         self.from = from
         self.to = to
@@ -36,4 +36,5 @@ public struct Email {
         self.reference = reference
         self.attachments = attachments
     }
+    
 }
