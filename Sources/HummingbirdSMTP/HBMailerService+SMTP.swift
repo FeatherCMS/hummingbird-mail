@@ -2,8 +2,7 @@ import Hummingbird
 import HummingbirdServices
 import HummingbirdMail
 import Logging
-@_exported import NIOSMTP
-
+import NIOSMTP
 
 public extension HBApplication.Services {
 
