@@ -1,7 +1,7 @@
 import Hummingbird
 import HummingbirdServices
 import HummingbirdMail
-import SotoSESv2
+import SotoCore
 
 public extension HBApplication.Services {
 

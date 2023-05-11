@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "feather-mail",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/feathercms/feather-mail",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8bb50fbb8367aeb17469a17f61f476e49c242713"
+      }
+    },
+    {
       "identity" : "hummingbird",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird.git",

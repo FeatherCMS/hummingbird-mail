@@ -2,6 +2,7 @@ import XCTest
 import NIO
 import Hummingbird
 import HummingbirdMail
+import HummingbirdAWS
 import HummingbirdSES
 import SotoCore
 import Logging
