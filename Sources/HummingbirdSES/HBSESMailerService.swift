@@ -1,5 +1,3 @@
-import Hummingbird
-import HummingbirdAWS
 import HummingbirdMail
 import SotoCore
 import SotoSESv2
@@ -28,7 +26,7 @@ struct HBSESMailerService: HBMailerService {
         eventLoop: EventLoop
     ) -> HBMailer {
         HBSESMailer(
-            service: self,
+            ses: ses,
             logger: logger,
             eventLoop: eventLoop
         )

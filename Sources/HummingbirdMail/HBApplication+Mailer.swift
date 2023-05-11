@@ -1,6 +1,5 @@
 import Hummingbird
 import HummingbirdServices
-import Logging
 
 public extension HBApplication.Services {
 

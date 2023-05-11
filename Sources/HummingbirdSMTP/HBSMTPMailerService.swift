@@ -2,6 +2,7 @@ import NIO
 import NIOSMTP
 import Logging
 import HummingbirdMail
+import FeatherSMTPMail
 
 struct HBSMTPMailerService: HBMailerService {
 
@@ -37,7 +38,7 @@ struct HBSMTPMailerService: HBMailerService {
         eventLoop: EventLoop
     ) -> HBMailer {
         HBSMTPMailer(
-            service: self,
+            smtp: smtp,
             logger: logger,
             eventLoop: eventLoop
         )
