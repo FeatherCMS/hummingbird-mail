@@ -7,10 +7,16 @@ let package = Package(
        .macOS(.v12),
     ],
     products: [
+        .library(name: "FeatherMail", targets: ["FeatherMail"]),
+        .library(name: "FeatherSESMail", targets: ["FeatherSESMail"]),
+        .library(name: "FeatherSMTPMail", targets: ["FeatherSMTPMail"]),
+        .library(name: "NIOSMTP", targets: ["NIOSMTP"]),
+        .library(name: "SotoSESv2", targets: ["SotoSESv2"]),
+        
         .library(name: "HummingbirdMail", targets: ["HummingbirdMail"]),
         .library(name: "HummingbirdSES", targets: ["HummingbirdSES"]),
         .library(name: "HummingbirdSMTP", targets: ["HummingbirdSMTP"]),
-        .library(name: "NIOSMTP", targets: ["NIOSMTP"]),
+        
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log", from: "1.5.0"),
@@ -23,18 +29,15 @@ let package = Package(
         .package(url: "https://github.com/FeatherCMS/hummingbird-services", branch: "main"),
     ],
     targets: [
-        .target(name: "HummingbirdMail", dependencies: [
-            .product(name: "Hummingbird", package: "hummingbird"),
-            .product(name: "HummingbirdServices", package: "hummingbird-services"),
+        .target(name: "FeatherMail", dependencies: [
         ]),
-        .target(name: "HummingbirdSES", dependencies: [
-            .product(name: "HummingbirdAWS", package: "hummingbird-aws"),
-            .target(name: "HummingbirdMail"),
+        .target(name: "FeatherSESMail", dependencies: [
+            .target(name: "FeatherMail"),
             .target(name: "SotoSESv2")
         ]),
-        .target(name: "HummingbirdSMTP", dependencies: [
+        .target(name: "FeatherSMTPMail", dependencies: [
             .target(name: "NIOSMTP"),
-            .target(name: "HummingbirdMail"),
+            .target(name: "FeatherMail"),
         ]),
         .target(
             name: "SotoSESv2",
@@ -53,15 +56,35 @@ let package = Package(
             .product(name: "NIOSSL", package: "swift-nio-ssl"),
             .product(name: "Logging", package: "swift-log"),
         ]),
-
-        .testTarget(name: "NIOSMTPTests", dependencies: [
-            .target(name: "NIOSMTP"),
+        // MARK: - HB packages
+        
+        .target(name: "HummingbirdMail", dependencies: [
+            .product(name: "Hummingbird", package: "hummingbird"),
+            .product(name: "HummingbirdServices", package: "hummingbird-services"),
+//            .product(name: "FeatherMail", package: "feather-mail"),
+            .target(name: "FeatherMail"),
         ]),
+        .target(name: "HummingbirdSES", dependencies: [
+            .target(name: "HummingbirdMail"),
+            .product(name: "HummingbirdAWS", package: "hummingbird-aws"),
+            .target(name: "FeatherSESMail"),
+        ]),
+        .target(name: "HummingbirdSMTP", dependencies: [
+            .target(name: "HummingbirdMail"),
+            .target(name: "FeatherSMTPMail"),
+        ]),
+        
         .testTarget(name: "HummingbirdSMTPTests", dependencies: [
             .target(name: "HummingbirdSMTP"),
         ]),
         .testTarget(name: "HummingbirdSESTests", dependencies: [
             .target(name: "HummingbirdSES"),
+        ]),
+        
+        // MARK: - feather tests
+        
+        .testTarget(name: "NIOSMTPTests", dependencies: [
+            .target(name: "NIOSMTP"),
         ]),
     ]
 )

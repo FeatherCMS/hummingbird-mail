@@ -3,6 +3,7 @@ import HummingbirdAWS
 import HummingbirdMail
 import SotoCore
 import SotoSESv2
+import FeatherMail
 
 struct HBSESMailerService: HBMailerService {
 

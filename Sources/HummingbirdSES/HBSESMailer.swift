@@ -2,6 +2,7 @@ import Hummingbird
 import HummingbirdAWS
 import HummingbirdMail
 import SotoSESv2
+import FeatherMail
 
 struct HBSESMailer: HBMailer {
 

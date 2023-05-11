@@ -2,6 +2,7 @@ import HummingbirdMail
 import NIOSMTP
 import NIOCore
 import Logging
+import FeatherMail
 
 struct HBSMTPMailer: HBMailer {
     

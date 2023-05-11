@@ -1,5 +1,6 @@
 import NIOCore
 import Logging
+import FeatherMail
 
 public protocol HBMailerService {
     

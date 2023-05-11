@@ -1,5 +1,6 @@
 import Hummingbird
 import HummingbirdServices
+import FeatherMail
 import Logging
 
 public extension HBApplication.Services {
