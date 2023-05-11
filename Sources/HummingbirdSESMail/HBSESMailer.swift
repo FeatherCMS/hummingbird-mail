@@ -1,5 +1,5 @@
-import HummingbirdMail
 import FeatherSESMail
+import HummingbirdMail
 import SotoSESv2
 
 struct HBSESMailer: HBMailer {
@@ -7,7 +7,7 @@ struct HBSESMailer: HBMailer {
     let ses: SESv2
     let logger: Logger
     let eventLoop: EventLoop
-    
+
     func send(_ email: HBMail) async throws {
         try await FeatherSESMailer(
             ses: ses,

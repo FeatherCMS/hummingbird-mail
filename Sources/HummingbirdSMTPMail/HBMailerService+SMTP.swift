@@ -1,12 +1,12 @@
 import Hummingbird
-import HummingbirdServices
 import HummingbirdMail
+import HummingbirdServices
 import Logging
 import NIOSMTP
 
-public extension HBApplication.Services {
+extension HBApplication.Services {
 
-    func setUpSMTPMailer(
+    public func setUpSMTPMailer(
         eventLoopGroup: EventLoopGroup,
         hostname: String,
         port: Int = 587,

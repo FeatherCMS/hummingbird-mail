@@ -1,9 +1,9 @@
 import Hummingbird
 import HummingbirdServices
 
-public extension HBApplication.Services {
+extension HBApplication.Services {
 
-    var mailer: HBMailerService {
+    public var mailer: HBMailerService {
         get {
             get(\.services.mailer, "Mailer service is not configured")
         }
@@ -13,9 +13,9 @@ public extension HBApplication.Services {
     }
 }
 
-public extension HBApplication {
+extension HBApplication {
 
-    var mailer: HBMailer {
+    public var mailer: HBMailer {
         services.mailer.make(
             logger: logger,
             eventLoop: eventLoopGroup.next()
@@ -23,9 +23,9 @@ public extension HBApplication {
     }
 }
 
-public extension HBRequest {
+extension HBRequest {
 
-    var mailer: HBMailer {
+    public var mailer: HBMailer {
         application.services.mailer.make(
             logger: logger,
             eventLoop: eventLoop

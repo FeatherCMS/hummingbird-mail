@@ -1,8 +1,8 @@
-import NIOCore
 import Logging
+import NIOCore
 
 public protocol HBMailerService {
-    
+
     func make(
         logger: Logger,
         eventLoop: EventLoop

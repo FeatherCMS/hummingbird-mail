@@ -1,11 +1,11 @@
 import Hummingbird
-import HummingbirdServices
 import HummingbirdMail
+import HummingbirdServices
 import SotoCore
 
-public extension HBApplication.Services {
+extension HBApplication.Services {
 
-    func setUpSESMailer(
+    public func setUpSESMailer(
         using aws: AWSClient,
         region: String
     ) {

@@ -1,23 +1,23 @@
-import XCTest
-import NIO
 import Hummingbird
-import HummingbirdMail
 import HummingbirdAWS
+import HummingbirdMail
 import HummingbirdSESMail
-import SotoCore
 import Logging
+import NIO
+import SotoCore
+import XCTest
 
 final class HummingbirdSESMailTests: XCTestCase {
-    
+
     var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
     var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
-    
+
     private func send(_ email: HBMail) async throws {
         let env = ProcessInfo.processInfo.environment
-        
+
         var logger = Logger(label: "aws-logger")
         logger.logLevel = .info
-        
+
         let app = HBApplication()
         app.services.aws = .init(
             credentialProvider: .static(
@@ -38,30 +38,30 @@ final class HummingbirdSESMailTests: XCTestCase {
             using: app.aws,
             region: env["SES_REGION"]!
         )
-        
+
         try await app.mailer.send(email)
         try app.shutdownApplication()
     }
-    
+
     // MARK: - test cases
-    
+
     func testSimpleText() async throws {
         let email = try HBMail(
             from: HBMailAddress(from),
             to: [
-                HBMailAddress(to),
+                HBMailAddress(to)
             ],
             subject: "test ses with simple text",
             body: "This is a simple text email body with SES."
         )
         try await send(email)
     }
-    
+
     func testHMTLText() async throws {
         let email = try HBMail(
             from: HBMailAddress(from),
             to: [
-                HBMailAddress(to),
+                HBMailAddress(to)
             ],
             subject: "test ses with HTML text",
             body: "This is a <b>HTML text</b> email body with SES.",
@@ -69,7 +69,7 @@ final class HummingbirdSESMailTests: XCTestCase {
         )
         try await send(email)
     }
-    
+
     func testAttachment() async throws {
         let packageRootPath = URL(fileURLWithPath: #file)
             .pathComponents
@@ -91,7 +91,7 @@ final class HummingbirdSESMailTests: XCTestCase {
         let email = try HBMail(
             from: HBMailAddress(from),
             to: [
-                HBMailAddress(to),
+                HBMailAddress(to)
             ],
             subject: "test ses with attachment",
             body: "This is an email body and attachment with SES.",

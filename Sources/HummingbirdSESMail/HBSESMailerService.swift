@@ -32,4 +32,3 @@ struct HBSESMailerService: HBMailerService {
         )
     }
 }
-

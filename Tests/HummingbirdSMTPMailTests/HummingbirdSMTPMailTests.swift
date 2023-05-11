@@ -1,15 +1,15 @@
-import XCTest
-import NIO
 import Hummingbird
 import HummingbirdMail
 import HummingbirdSMTPMail
 import Logging
+import NIO
+import XCTest
 
 final class HummingbirdMTPMailTests: XCTestCase {
-    
+
     var from: String { ProcessInfo.processInfo.environment["MAIL_FROM"]! }
     var to: String { ProcessInfo.processInfo.environment["MAIL_TO"]! }
-    
+
     private func send(_ email: HBMail) async throws {
         let env = ProcessInfo.processInfo.environment
 
@@ -26,26 +26,26 @@ final class HummingbirdMTPMailTests: XCTestCase {
         try await app.mailer.send(email)
         try app.shutdownApplication()
     }
-    
+
     // MARK: - test cases
 
     func testSimpleText() async throws {
         let email = try HBMail(
             from: HBMailAddress(from),
             to: [
-                HBMailAddress(to),
+                HBMailAddress(to)
             ],
             subject: "test SMTP with simple text",
             body: "This is a simple text email body with SMTP."
         )
         try await send(email)
     }
-    
+
     func testHMTLText() async throws {
         let email = try HBMail(
             from: HBMailAddress(from),
             to: [
-                HBMailAddress(to),
+                HBMailAddress(to)
             ],
             subject: "test SMTP with HTML text",
             body: "This is a <b>HTML text</b> email body with SMTP.",
@@ -53,7 +53,7 @@ final class HummingbirdMTPMailTests: XCTestCase {
         )
         try await send(email)
     }
-    
+
     func testAttachment() async throws {
         let packageRootPath = URL(fileURLWithPath: #file)
             .pathComponents
@@ -75,7 +75,7 @@ final class HummingbirdMTPMailTests: XCTestCase {
         let email = try HBMail(
             from: HBMailAddress(from),
             to: [
-                HBMailAddress(to),
+                HBMailAddress(to)
             ],
             subject: "test SMTP with attachment",
             body: "This is an email body and attachment with SMTP.",
