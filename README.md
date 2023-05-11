@@ -21,8 +21,8 @@ and HummingbirdMail dependency to your target:
 Mail provider services
 
 ```swift
-.product(name: "HummingbirdSMTP", package: "hummingbird-mail"),
-.product(name: "HummingbirdSES", package: "hummingbird-mail"),
+.product(name: "HummingbirdSMTPMail", package: "hummingbird-mail"),
+.product(name: "HummingbirdSESMail", package: "hummingbird-mail"),
 ```    
 
 ## HummingbirdSES
@@ -32,7 +32,7 @@ Simple usage
 ```swift
 import Hummingbird
 import HummingbirdMail
-import HummingbirdSES
+import HummingbirdSESMail
 
 let env = ProcessInfo.processInfo.environment
 let logger = Logger(label: "aws-logger")
@@ -73,7 +73,7 @@ Simple usage
 ```swift
 import Hummingbird
 import HummingbirdMail
-import HummingbirdSMTP
+import HummingbirdSMTPMail
 
 let env = ProcessInfo.processInfo.environment
 

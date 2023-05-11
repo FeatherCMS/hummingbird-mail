@@ -1,11 +1,11 @@
-import HummingbirdMail
-import NIOSMTP
-import NIOCore
-import Logging
 import FeatherSMTPMail
+import HummingbirdMail
+import Logging
+import NIOCore
+import NIOSMTP
 
 struct HBSMTPMailer: HBMailer {
-    
+
     let smtp: NIOSMTP
     let logger: Logger
     let eventLoop: EventLoop
